@@ -152,7 +152,7 @@ public class Enemy : MonoBehaviour
             Vector3 shootDirection = (player.position - transform.position).normalized;
             
             // Create projectile slightly in front of enemy to avoid self-collision
-            Vector3 projectilePos = transform.position + transform.forward * 1.5f + Vector3.up * 1.5f;
+            Vector3 projectilePos = transform.position + transform.forward * 1.5f + Vector3.up * 0.5f;
             
             // Instantiate the projectile
             GameObject bulletInstance = Instantiate(projectile, projectilePos, Quaternion.identity);
@@ -176,8 +176,8 @@ public class Enemy : MonoBehaviour
             
             //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Add force to the projectile
-            rb.AddForce(shootDirection * 20f, ForceMode.Impulse);
-            rb.AddForce(Vector3.up * 1.5f, ForceMode.Impulse); // Add slight upward force
+            rb.AddForce(shootDirection * 70f, ForceMode.Impulse);
+            //rb.AddForce(Vector3.up * 1.5f, ForceMode.Impulse); // Add slight upward force
             /////////////////////////////////////////////////////////////////////////////////////////////
             
             Debug.Log("Enemy " + gameObject.name + " fired projectile at player!");
@@ -244,20 +244,24 @@ public class Enemy : MonoBehaviour
     void Respawn()
     {
         Debug.Log(gameObject.name + " started respawn sequence");
-        // Disable components instead of destroying immediately for debugging
+        
+        // Reset health
+        health = 100f;
+        
+        // Re-enable components
         if (agent != null)
         {
             agent.enabled = true;
         }
 
-        // Disable all colliders
+        // Re-enable all colliders
         Collider[] colliders = GetComponents<Collider>();
         foreach (Collider c in colliders)
         {
             c.enabled = true;
         }
 
-        // Change color to red to indicate death
+        // Change color BACK TO WHITE to indicate respawn
         Renderer[] renderers = GetComponentsInChildren<Renderer>();
         foreach (Renderer r in renderers)
         {
@@ -266,6 +270,8 @@ public class Enemy : MonoBehaviour
                 r.material.color = Color.white;
             }
         }
+        
+        Debug.Log(gameObject.name + " respawned with " + health + " health");
     }
 
     private void OnDrawGizmosSelected()

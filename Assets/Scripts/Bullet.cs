@@ -4,6 +4,7 @@ public class Bullet : MonoBehaviour
 {
     public float damage = 20f;
     public bool isPlayerBullet = true; // To determine if bullet is from player or enemy
+    public float knockbackForce = 20f; // Knockback force applied to player when hit
     
     // Add a reference to the renderer for visual debugging
     private Renderer bulletRenderer;
@@ -44,8 +45,6 @@ public class Bullet : MonoBehaviour
         }
         
         // Handle collision with player
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        ///Perhaps if we can get the position of the player, we can push the player back in line with the force of the bullet.
         else if (!isPlayerBullet && collision.gameObject.CompareTag("Player"))
         {
             PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
@@ -53,6 +52,19 @@ public class Bullet : MonoBehaviour
             {
                 playerHealth.TakeDamage(damage);
                 Debug.Log("Enemy bullet hit player for " + damage + " damage");
+                
+                // Apply knockback to player
+                Rigidbody playerRb = collision.gameObject.GetComponent<Rigidbody>();
+                if (playerRb != null)
+                {
+                    // Calculate knockback direction from bullet to player
+                    //Vector3 knockbackDirection = (collision.transform.position - transform.position).normalized;
+                    Rigidbody bulletRb = GetComponent<Rigidbody>();
+                    Vector3 knockbackDirection = bulletRb != null ? bulletRb.linearVelocity.normalized : transform.forward;
+                    // Apply the force
+                    playerRb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                    Debug.Log("Applied knockback force: " + knockbackForce + " in direction: " + knockbackDirection);
+                }
             }
             else
             {
@@ -89,6 +101,22 @@ public class Bullet : MonoBehaviour
             {
                 playerHealth.TakeDamage(damage);
                 Debug.Log("Enemy bullet triggered player for " + damage + " damage");
+                
+                // Apply knockback to player
+                Rigidbody playerRb = other.GetComponent<Rigidbody>();
+                if (playerRb != null)
+                {
+                    // Calculate knockback direction from bullet to player
+                    Vector3 knockbackDirection = (other.transform.position - transform.position).normalized;
+                    
+                    // Apply the force
+                    playerRb.AddForce(knockbackDirection * knockbackForce, ForceMode.Impulse);
+                    Debug.Log("Applied knockback force: " + knockbackForce + " in direction: " + knockbackDirection);
+                }
+            }
+            else
+            {
+                Debug.LogWarning("Hit object tagged as Player but no PlayerHealth component found");
             }
         }
         
