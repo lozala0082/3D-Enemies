@@ -44,6 +44,8 @@ public class Bullet : MonoBehaviour
         }
         
         // Handle collision with player
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ///Perhaps if we can get the position of the player, we can push the player back in line with the force of the bullet.
         else if (!isPlayerBullet && collision.gameObject.CompareTag("Player"))
         {
             PlayerHealth playerHealth = collision.gameObject.GetComponent<PlayerHealth>();
