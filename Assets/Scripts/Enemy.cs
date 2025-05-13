@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
-{   
+{
+    
+
     public NavMeshAgent agent;
     public Transform player;
     public LayerMask Ground, whatIsPlayer;
@@ -172,9 +174,11 @@ public class Enemy : MonoBehaviour
             bulletScript.isPlayerBullet = false;
             bulletScript.damage = 10f;
             
+            //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // Add force to the projectile
             rb.AddForce(shootDirection * 20f, ForceMode.Impulse);
-            rb.AddForce(Vector3.up * 2f, ForceMode.Impulse); // Add slight upward force
+            rb.AddForce(Vector3.up * 1.5f, ForceMode.Impulse); // Add slight upward force
+            /////////////////////////////////////////////////////////////////////////////////////////////
             
             Debug.Log("Enemy " + gameObject.name + " fired projectile at player!");
             
@@ -231,9 +235,37 @@ public class Enemy : MonoBehaviour
                 r.material.color = Color.red;
             }
         }
-        
+        score.instance.score_count++;
+        score.instance.UpdateCounterUI();
         // Destroy after delay
-        Destroy(gameObject, 2f);
+        Invoke("Respawn", 2.0f);
+    }
+
+    void Respawn()
+    {
+        Debug.Log(gameObject.name + " started respawn sequence");
+        // Disable components instead of destroying immediately for debugging
+        if (agent != null)
+        {
+            agent.enabled = true;
+        }
+
+        // Disable all colliders
+        Collider[] colliders = GetComponents<Collider>();
+        foreach (Collider c in colliders)
+        {
+            c.enabled = true;
+        }
+
+        // Change color to red to indicate death
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (Renderer r in renderers)
+        {
+            if (r.material != null)
+            {
+                r.material.color = Color.white;
+            }
+        }
     }
 
     private void OnDrawGizmosSelected()
